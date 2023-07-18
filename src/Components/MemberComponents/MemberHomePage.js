@@ -15,11 +15,12 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { alertTitleClasses } from '@mui/material';
 import { Carousel } from 'react-bootstrap';
-import { Pie } from 'react-chartjs-2';
+// import { Pie } from 'react-chartjs-2';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import { PieChart, Pie, Cell, Legend } from 'recharts';
 
 export const MemberHomePage = () => {
   const [memberDetails, setMemberDetails] = useState({});
@@ -218,28 +219,95 @@ export const MemberHomePage = () => {
     }
   };
 
+  // const handleEventFormSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   // Perform form validation
+  //   if (!newEvent.eventName || !newEvent.fromDate || !newEvent.toDate) {
+  //     alert('Please fill out all fields.');
+  //     return;
+  //   }
+
+  //   const currentDate = new Date(); // Get the current date
+  //   const fromDate = newEvent.fromDate;
+  //   const toDate = newEvent.toDate;
+  
+  //   // Check if the dates are in the past
+  //   if (fromDate < currentDate || toDate < currentDate ) {
+  //     alert('Please select valid dates.');
+  //     return;
+  //   }
+
+  //   if(toDate<fromDate)
+  //   {
+  //     alert("pls select a valid to date ")
+  //   }
+  
+  //   // Check if the dates are already booked
+  //   const eventsData = events.map((event) => ({
+  //     ...event,
+  //     fromDate: new Date(event.fromDate),
+  //     toDate: new Date(event.toDate),
+  //   }));
+  
+  //   for (const event of eventsData) {
+  //     if ((fromDate >= event.fromDate && fromDate <= event.toDate) || (toDate >= event.fromDate && toDate <= event.toDate)) {
+  //       alert('The selected dates are already booked.');
+  //       return;
+  //     }
+  //   }
+
+  //   // Set the userId to the current logged-in user's userId
+  //   const userId = parseInt(localStorage.getItem('userId'));
+  //   setNewEvent({
+  //     ...newEvent,
+  //     userId,
+  //   });
+
+  //   // Make a POST request to the backend API to add the new event
+  //   try {
+  //     const userId = parseInt(localStorage.getItem('userId'));
+  //     const response = await axios.post('http://localhost:9001/members/events/add', newEvent);
+  //     alert("event added!!!")
+  //     console.log(response.data); // Handle success response
+
+  //     // Close the add event modal and reset the form
+  //     setShowAddModal(false);
+  //     setNewEvent({
+  //       eventName: '',
+  //       fromDate: null,
+  //       toDate: null,
+  //       userId: '', // Reset userId field
+  //     });
+  //   } catch (error) {
+  //     console.error(error); // Handle error response
+  //     //alert('Failed to add event. Please try again.');
+  //   }
+  // };
+
+
   const handleEventFormSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Perform form validation
     if (!newEvent.eventName || !newEvent.fromDate || !newEvent.toDate) {
       alert('Please fill out all fields.');
       return;
     }
-
+  
     const currentDate = new Date(); // Get the current date
     const fromDate = newEvent.fromDate;
     const toDate = newEvent.toDate;
   
     // Check if the dates are in the past
-    if (fromDate < currentDate || toDate < currentDate ) {
+    if (fromDate < currentDate || toDate < currentDate) {
       alert('Please select valid dates.');
       return;
     }
-
-    if(toDate<fromDate)
-    {
-      alert("pls select a valid to date ")
+  
+    if (toDate < fromDate) {
+      alert('Please select a valid to date.');
+      return;
     }
   
     // Check if the dates are already booked
@@ -250,26 +318,29 @@ export const MemberHomePage = () => {
     }));
   
     for (const event of eventsData) {
-      if ((fromDate >= event.fromDate && fromDate <= event.toDate) || (toDate >= event.fromDate && toDate <= event.toDate)) {
+      if (
+        (fromDate >= event.fromDate && fromDate <= event.toDate) ||
+        (toDate >= event.fromDate && toDate <= event.toDate) ||
+        (fromDate <= event.fromDate && toDate >= event.toDate)
+      ) {
         alert('The selected dates are already booked.');
         return;
       }
     }
-
+  
     // Set the userId to the current logged-in user's userId
     const userId = parseInt(localStorage.getItem('userId'));
     setNewEvent({
       ...newEvent,
       userId,
     });
-
+  
     // Make a POST request to the backend API to add the new event
     try {
-      const userId = parseInt(localStorage.getItem('userId'));
       const response = await axios.post('http://localhost:9001/members/events/add', newEvent);
-      alert("event added!!!")
+      alert('Event added successfully!');
       console.log(response.data); // Handle success response
-
+  
       // Close the add event modal and reset the form
       setShowAddModal(false);
       setNewEvent({
@@ -280,10 +351,10 @@ export const MemberHomePage = () => {
       });
     } catch (error) {
       console.error(error); // Handle error response
-      //alert('Failed to add event. Please try again.');
+      alert('Failed to add event. Please try again.');
     }
   };
-
+  
 
 
 
@@ -885,389 +956,557 @@ return (
 //----------------------------------------------------------------------------------------------------------------------------
 
 
+const [showTable4, setShowTable4] = useState(false);
+const [contestantsData, setContestantsData] = useState([]);
+
+const hancleDecision = () => {
+  setShowTable4((prevShowTable) => !prevShowTable);
+};   
+
+const renderPieChart = (role) => {
+  const filteredData = contestantsData.filter((data) => data.role === role);
+  const data = filteredData.map((data) => ({
+    name: data.contestant_name,
+    value: data.candidate_votes,
+  }));
+
+  if (filteredData.length === 0) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}>
+      <p style={{ fontWeight: 'bold', margin: 0 }}>No data available</p>
+    </div>
+    );
+  }
+
+  const colors = ['#FF6384', '#36A2EB', '#FFCE56'];
+
   return (
     <div>
-      <nav>
-        <nav className='navbar navbar-expand-lg navbar-dark bg-dark'>
-          <div className='container-fluid'>
-            <button className='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav'>
-              <span className='navbar-toggler-icon'></span>
-            </button>
-            <div className='collapse navbar-collapse' id='navbarNav'>
-              <ul className='navbar-nav mr-auto'>
-                <Dropdown>
-                  <Dropdown.Toggle variant='dark' id='dropdown-myprofile'>
-                    <AccountBoxIcon/>
-                    My Profile
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item onClick={handleClick2}>Update Profile</Dropdown.Item>
-                    <Dropdown.Item onClick={handleUpdateProfile}>Blank</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Dropdown>
-                  <Dropdown.Toggle variant='dark' id='dropdown-operations'>
-                    Operations
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item onClick={handleComplaintModalOpen}>Complaints/Suggestions</Dropdown.Item>
-                    <Dropdown.Item onClick={handleEvents}>Events</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Dropdown>
-                  <Dropdown.Toggle variant='dark' id='dropdown-pay'>
-                    <PaymentsIcon/>
-                    Pay
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    
-                    <Dropdown.Item  onClick={() => setShowAccountsModal(true)}>
-                     <AccountBalanceIcon/> Accounts</Dropdown.Item>
-                    
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Dropdown>
-                  <Dropdown.Toggle variant='dark' id='dropdown-election'>
-                    Election
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    
-                    <Dropdown.Item href='#'>Nomination</Dropdown.Item>
-                    <Dropdown.Item href='#'>Voting</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </ul>
-              <ul className='navbar-nav'>
-                <div className="ms-auto">
-                  <li className='nav-item'>
-                    <button className='btn btn-danger' onClick={logout}>
-                      <LogoutIcon /> Logout
-                    </button>
-                  </li>
-                </div>
-              </ul>
-            </div>
+        <PieChart width={440} height={360}>
+          <Pie
+            dataKey="value"
+            data={data}
+            fill="#8884d8"
+            label={({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
+              const RADIAN = Math.PI / 180;
+              const radius = 25 + innerRadius + (outerRadius - innerRadius);
+              const x = cx + radius * Math.cos(-midAngle * RADIAN);
+              const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+              return (
+                <text
+                  x={x}
+                  y={y}
+                  textAnchor={x > cx ? 'start' : 'end'}
+                  dominantBaseline="bottom"
+                  
+                  style={{ fontWeight: 'bold', fill: ["white"] }}
+                >
+                  <tspan>{data[index].name}</tspan>
+              <tspan x={x} dy={15}>
+                votes: {value}
+              </tspan>
+                </text>
+              );
+            }}
+          >
+            {data.map((entry, index) => (
+              <Cell key={entry.name} fill={colors[index % colors.length]} />
+            ))}
+          </Pie>
+        </PieChart>
+    </div>
+  );
+};
+
+const [electionId, setElectionId] = useState({
+
+  election_id: ''
+});
+
+const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+const renderTable4 = () => {
+  if (!showTable4) {
+    return null;
+  }
+
+const handleElectionId = (event) => {
+
+  const { name, value } = event.target;
+    setElectionId({ ...electionId, [name]: value });
+
+    // Enable or disable the button based on the input value
+    setIsButtonDisabled(value.trim() === '');
+}
+  
+
+  const handlefetchData = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.get(`http://localhost:9001/ballotbox/oneballot/${electionId.election_id}`, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const results = response.data;
+      setContestantsData(results);
+      console.log(contestantsData);
+      // alert('Results Fetched Successfully!');
+    }catch (error) {
+      if (error.response && error.response.status === 409) {
+        alert("Invalid Election ID!");
+      } else {
+          alert("Unknown Eroor!");
+      }
+    }
+  };
+
+  return (
+    
+    <div>
+    <form onSubmit={handlefetchData}><br/>
+    {/* <p>No Data Available</p> */}
+    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div>
+        <form>
+          <h4>
+            <u style={{ color: 'gold' }}>Presidents</u>
+          </h4><br/><br/><br/>
+          {renderPieChart('president')}
+        </form>
+      </div>
+      <div>
+        <form>
+          <h4>
+            <u style={{ color: 'cyan' }}>Secretaries</u>
+          </h4><br/><br/><br/>
+          {renderPieChart('secretary')}
+        </form>
+      </div>
+      <div>
+        <form >
+          <h4>
+            <u style={{ color: 'chartreuse' }}>Treasurers</u>
+          </h4><br/><br/><br/>
+          {renderPieChart('treasurer')}
+        </form>
+        </div>
+      </div><br/><br/>
+      <input  onChange={handleElectionId} type='number' placeholder='Election ID' id='election_id' name='election_id' required></input><span>  </span>
+      <button type='submit' disabled={isButtonDisabled} className={isButtonDisabled ? 'disabled' : ''}> <b>Fetch Results</b></button>
+      </form>
+      </div>
+    
+  );
+// }
+};
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+
+return (<div className='container mt-4'>
+{isLoggedIn1 ? (
+  <>
+
+  <div>
+    <nav>
+      <nav className='navbar navbar-expand-lg navbar-dark bg-dark'>
+        <div className='container-fluid'>
+          <button className='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav'>
+            <span className='navbar-toggler-icon'></span>
+          </button>
+          <div className='collapse navbar-collapse' id='navbarNav'>
+            <ul className='navbar-nav mr-auto'>
+              <Dropdown>
+                <Dropdown.Toggle variant='dark' id='dropdown-myprofile'>
+                  <AccountBoxIcon/>
+                  My Profile
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={handleClick2}>Update Profile</Dropdown.Item>
+                  <Dropdown.Item onClick={handleUpdateProfile}>Blank</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+              <Dropdown>
+                <Dropdown.Toggle variant='dark' id='dropdown-operations'>
+                  Operations
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={handleComplaintModalOpen}>Complaints/Suggestions</Dropdown.Item>
+                  <Dropdown.Item onClick={handleEvents}>Events</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+              <Dropdown>
+                <Dropdown.Toggle variant='dark' id='dropdown-pay'>
+                  <PaymentsIcon/>
+                  Pay
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  
+                  <Dropdown.Item  onClick={() => setShowAccountsModal(true)}>
+                   <AccountBalanceIcon/> Accounts</Dropdown.Item>
+                  
+                </Dropdown.Menu>
+              </Dropdown>
+              <Dropdown>
+                <Dropdown.Toggle variant='dark' id='dropdown-election'>
+                  Election
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  
+                  <Dropdown.Item href='#'>Nomination</Dropdown.Item>
+                  <Dropdown.Item href='#'>Voting</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ul>
+            <ul className='navbar-nav'>
+              <div className="ms-auto">
+                <li className='nav-item'>
+                  <button className='btn btn-danger' onClick={logout}>
+                    <LogoutIcon /> Logout
+                  </button>
+                </li>
+              </div>
+            </ul>
           </div>
-        </nav>
+        </div>
       </nav>
+    </nav>
+    </div>
 
-      <div className='container mt-4'>
-        {isLoggedIn1 ? (
+    
+            
+              
+                {renderTable4()}
+                  <button className='link-btn' onClick={hancleDecision}><h6>{showTable4 ? 'Close' : 'Display Results'}</h6></button>
+                
+              
+            
+          
+
+    
+          <h1  style={{ color: 'white' }} >Welcome</h1>
+          <h4   style={{ color: 'white' }}>
+            {memberDetails.firstName} {memberDetails.lastName}
+          </h4>
+          <hr />
+          <h2>Notices</h2>
+          {notices.length > 0 ? (
+<div className="carousel-container">
+  <Carousel>
+    {notices.map((notice) => (
+      <Carousel.Item key={notice.id}>
+        <div className="notice-card">
+          <h5 className="notice-heading">{notice.heading.toUpperCase()}</h5>
+          <p className="notice-date">Date Issued: {notice.dateIssued}</p>
+          <div className="notice-content">{notice.notice}</div>
+        </div>
+      </Carousel.Item>
+    ))}
+  </Carousel>
+</div>
+
+
+
+
+
+
+) : (
+  <p>No notices available</p>
+)}
+
+          {isNominationsActive ? (
+          <table className="table table-bordered">
+          <tbody>
+            <tr>
+              <td>
           <>
-            <h1>Welcome</h1>
-            <h4>
-              {memberDetails.firstName} {memberDetails.lastName}
-            </h4>
-            <hr />
-            <h2>Notices</h2>
-            {notices.length > 0 ? (
-  <div className="carousel-container">
-    <Carousel>
-      {notices.map((notice) => (
-        <Carousel.Item key={notice.id}>
-          <div className="notice-card">
-            <h5 className="notice-heading">{notice.heading.toUpperCase()}</h5>
-            <p className="notice-date">Date Issued: {notice.dateIssued}</p>
-            <div className="notice-content">{notice.notice}</div>
+          {renderTable1()}
+          <div style={{ marginTop: '10px' }}>
+          <button className='btn btn-danger' onClick={handleClick5}><h6>{showTable1 ? 'Close' : 'Contest in Elections'}</h6></button>
           </div>
-        </Carousel.Item>
-      ))}
-    </Carousel>
-  </div>
-
-  ) : (
-    <p>No notices available</p>
-  )}
-
-            {isNominationsActive ? (
-            <table className="table table-bordered">
-            <tbody>
-              <tr>
-                <td>
-            <>
-            {renderTable1()}
-            <div style={{ marginTop: '10px' }}>
-            <button className='btn btn-danger' onClick={handleClick5}><h6>{showTable1 ? 'Close' : 'Contest in Elections'}</h6></button>
-            </div>
-            </>
-            </td>
-            </tr>
-            </tbody>
-            </table>   
-            ) : (
-            <>
-            </>
-            ) 
-          }
+          </>
+          </td>
+          </tr>
+          </tbody>
+          </table>   
+          ) : (
+          <>
+          </>
+          ) 
+        }
 
 {isPollsActive ? (
-            <table className="table table-bordered">
-            <tbody>
-              <tr>
-                <td>
-            <>
-            {renderTable2()}
-            <div style={{ marginTop: '10px' }}>
-            <button  class="btn btn-primary" onClick={handleClick7}><h6>{showTable2 ? 'Hide' : 'Cast your Vote'}</h6></button>
-            </div>
-            </>
-            </td>
-            </tr>
-            </tbody>
-            </table>   
-            ) : (
-            <>
-            </>
-            ) 
-          }
+          <table className="table table-bordered">
+          <tbody>
+            <tr>
+              <td>
+          <>
+          {renderTable2()}
+          <div style={{ marginTop: '10px' }}>
+          <button  class="btn btn-primary" onClick={handleClick7}><h6>{showTable2 ? 'Hide' : 'Cast your Vote'}</h6></button>
+          </div>
+          </>
+          </td>
+          </tr>
+          </tbody>
+          </table>   
+          ) : (
+          <>
+          </>
+          ) 
+        }
 
-          {isResultsActive ? (
-            <table className="table table-bordered">
-            <tbody>
-              <tr>
-                <td>
-            <>
-            {renderTable3()}
-            <div style={{ marginTop: '10px' }}>
-            <button className='btn btn-primary' onClick={handleClick9}><h6>{showTable3 ? 'Close' : 'View Results'}</h6><VisibilityIcon/></button>
-            </div>
-            </>
-            </td>
-            </tr>
-            </tbody>
-            </table>   
-            ) : (
-            <>
-            </>
-            ) 
-          }
-            
-            {/* Member Details Modal */}
-            <Modal show={showModal} dialogClassName="custom-modal" onHide={() => setShowModal(false)}>
-              <Modal.Header closeButton>
-                <Modal.Title>Member Details</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <table className='table table-bordered'>
-                  <thead>
-                    <tr>
-                      <th>User ID</th>
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Email</th>
-                      <th>Mobile No</th>
-                      <th>Flat No</th>
-                      <th>Role</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{modalMemberDetails.userId}</td>
-                      <td>{modalMemberDetails.firstName}</td>
-                      <td>{modalMemberDetails.lastName}</td>
-                      <td>{modalMemberDetails.email}</td>
-                      <td>{modalMemberDetails.mobileNo}</td>
-                      <td>{modalMemberDetails.flatNo}</td>
-                      <td>{modalMemberDetails.role}</td>
-                      <td>
-                        <a className="edit" title="Edit" data-toggle="tooltip">
-                           <EditIcon/> 
-                        </a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant='secondary' onClick={() => setShowModal(false)}>
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
+        {isResultsActive ? (
+          <table className="table table-bordered">
+          <tbody>
+            <tr>
+              <td>
+          <>
+          {renderTable3()}
+          <div style={{ marginTop: '10px' }}>
+          <button className='btn btn-primary' onClick={handleClick9}><h6>{showTable3 ? 'Close' : 'View Results'}</h6><VisibilityIcon/></button>
+          </div>
+          </>
+          </td>
+          </tr>
+          </tbody>
+          </table>   
+          ) : (
+          <>
+          </>
+          ) 
+        }
+          
+          {/* Member Details Modal */}
+          <Modal show={showModal} dialogClassName="custom-modal" onHide={() => setShowModal(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title>Member Details</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <table className='table table-bordered'>
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Mobile No</th>
+                    <th>Flat No</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{modalMemberDetails.userId}</td>
+                    <td>{modalMemberDetails.firstName}</td>
+                    <td>{modalMemberDetails.lastName}</td>
+                    <td>{modalMemberDetails.email}</td>
+                    <td>{modalMemberDetails.mobileNo}</td>
+                    <td>{modalMemberDetails.flatNo}</td>
+                    <td>{modalMemberDetails.role}</td>
+                    <td>
+                      <a className="edit" title="Edit" data-toggle="tooltip">
+                         <EditIcon/> 
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant='secondary' onClick={() => setShowModal(false)}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
-            
+          
 
 {/* event Details Modal */}
 <Modal show={showModal1} dialogClassName='custom-modal' onHide={() => setShowModal1(false)}>
-  <Modal.Header closeButton>
-    <Modal.Title>Events</Modal.Title>
-    <div class="col-sm-4">
-                        <button type="button" onClick={handleAddEvent} class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
-                    </div>
-  </Modal.Header>
-  <Modal.Body>
-    <table className='table table-bordered'>
-      <thead>
-        <tr>
-          <th>Event Id</th>
-          <th>Event Name</th>
-          <th>From Date</th>
-          <th>To Date</th>
-          <th>Status</th>
-          <th>Actions</th>
+<Modal.Header closeButton>
+  <Modal.Title>Events</Modal.Title>
+  <div class="col-sm-4">
+                      <button type="button" onClick={handleAddEvent} class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+                  </div>
+</Modal.Header>
+<Modal.Body>
+  <table className='table table-bordered'>
+    <thead>
+      <tr>
+        <th>Event Id</th>
+        <th>Event Name</th>
+        <th>From Date</th>
+        <th>To Date</th>
+        <th>Status</th>
+        <th>Actions</th>
 
-        </tr>
-      </thead>
-      <tbody>
-        {events.map((event) => (
-          <tr key={event.eventId}>
-            <td>{event.eventId}</td>
-            <td>{event.eventName}</td>
-            <td>{event.fromDate}</td>
-            <td>{event.toDate}</td>
-            <td>{event.status}</td>
+      </tr>
+    </thead>
+    <tbody>
+      {events.map((event) => (
+        <tr key={event.eventId}>
+          <td>{event.eventId}</td>
+          <td>{event.eventName}</td>
+          <td>{event.fromDate}</td>
+          <td>{event.toDate}</td>
+          <td>{event.status}</td>
+          
+          <td>
             
-            <td>
-              
-              <Button variant='danger' onClick={() => handleDeleteEvent(event.eventId)}>
-                Delete
-              </Button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant='secondary' onClick={() => setShowModal1(false)}>
-      Close
-    </Button>
-  </Modal.Footer>
+            <Button variant='danger' onClick={() => handleDeleteEvent(event.eventId)}>
+              Delete
+            </Button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</Modal.Body>
+<Modal.Footer>
+  <Button variant='secondary' onClick={() => setShowModal1(false)}>
+    Close
+  </Button>
+</Modal.Footer>
 </Modal>
 
- {/* Add Event Modal */}
- <Modal show={showAddModal} onHide={handleAddEvent}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Event</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleEventFormSubmit}>
-            <Form.Group controlId='eventName'>
-              <Form.Label>Event Name</Form.Label>
-              <Form.Control type='text' name='eventName' value={newEvent.eventName} onChange={handleEventFormChange} />
-            </Form.Group>
-            <Form.Group controlId='fromDate'>
-              <Form.Label>From Date</Form.Label>
-              <br />
-              <DatePicker selected={newEvent.fromDate} onChange={handleFromDateChange} />
-            </Form.Group>
-            <Form.Group controlId='toDate'>
-              <Form.Label>To Date</Form.Label>
-              <br />
-              <DatePicker selected={newEvent.toDate} onChange={handleToDateChange} />
-            </Form.Group>
-            <Button variant='primary' type='submit'>
-              Submit
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
-
-      {/* Complaint/Suggestion Modal */}
-      <Modal show={showComplaintModal} onHide={handleComplaintModalClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Complaints/Suggestions</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleComplaintFormSubmit}>
-            <Form.Group controlId="complaintDescription">
-              <Form.Label>Description</Form.Label>
-              <Form.Select
-                name="description"
-                value={complaintData.description}
-                onChange={handleComplaintFormChange}
-              >
-                <option value="">Select an option</option>
-                <option value="suggestion">Suggestion</option>
-                <option value="complaint">Complaint</option>
-              </Form.Select>
-            </Form.Group>
-            <Form.Group controlId="complaintMessage">
-              <Form.Label>Message</Form.Label>
-              <Form.Control
-                as="textarea"
-                name="message"
-                value={complaintData.message}
-                onChange={handleComplaintFormChange}
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
-
-
-      <Modal show={showAccountsModal} dialogClassName="custom-modal" onHide={() => setShowAccountsModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Accounts</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Maintenance</th>
-                  <th>Month</th>
-                  <th>Paid On</th>
-                  <th>Status</th>
-                  <th>Total</th>
-                  <th>Water Bill</th>
-                  <th>User ID</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {accounts.map((account) => (
-                  <tr key={account.id}>
-                    <td>{account.id}</td>
-                    <td>{account.maintenanceBill}</td>
-                    <td>{account.month}</td>
-                    <td>{account.paidOn}</td>
-                    <td>{account.status}</td>
-                    <td>{account.total}</td>
-                    <td>{account.waterBill}</td>
-                    <td>{account.userId}</td>
-                    <td>
-                      {account.status !== 'Paid' && (
-                        <Button variant='success' onClick={() => handlePay(account.id)}>
-                          Pay
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant='secondary' onClick={() => setShowAccountsModal(false)}>
-              Close
-            </Button>
-          </Modal.Footer>
-          </Modal>
-
-      
-
-
-
-            <hr />
-          </>
-        ) : (
-          <div>
-            <h1>You are Logged out!</h1>
-            <button onClick={handleClick3} className='btn btn-primary btn-block'>
-              <h3>Login as Member</h3>
-            </button>
+{/* Add Event Modal */}
+<Modal show={showAddModal} onHide={handleAddEvent}>
+      <Modal.Header closeButton>
+        <Modal.Title>Add Event</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleEventFormSubmit}>
+          <Form.Group controlId='eventName'>
+            <Form.Label>Event Name</Form.Label>
+            <Form.Control type='text' name='eventName' value={newEvent.eventName} onChange={handleEventFormChange} />
+          </Form.Group>
+          <Form.Group controlId='fromDate'>
+            <Form.Label>From Date</Form.Label>
             <br />
-            <button className='link-btn' onClick={handleClick4}>
-              <h5>Go back to main page</h5>
-            </button>
-          </div>
-        )}
-      </div>
+            <DatePicker selected={newEvent.fromDate} onChange={handleFromDateChange} />
+          </Form.Group>
+          <Form.Group controlId='toDate'>
+            <Form.Label>To Date</Form.Label>
+            <br />
+            <DatePicker selected={newEvent.toDate} onChange={handleToDateChange} />
+          </Form.Group>
+          <Button variant='primary' type='submit'>
+            Submit
+          </Button>
+        </Form>
+      </Modal.Body>
+    </Modal>
+
+    {/* Complaint/Suggestion Modal */}
+    <Modal show={showComplaintModal} onHide={handleComplaintModalClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Complaints/Suggestions</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleComplaintFormSubmit}>
+          <Form.Group controlId="complaintDescription">
+            <Form.Label>Description</Form.Label>
+            <Form.Select
+              name="description"
+              value={complaintData.description}
+              onChange={handleComplaintFormChange}
+            >
+              <option value="">Select an option</option>
+              <option value="suggestion">Suggestion</option>
+              <option value="complaint">Complaint</option>
+            </Form.Select>
+          </Form.Group>
+          <Form.Group controlId="complaintMessage">
+            <Form.Label>Message</Form.Label>
+            <Form.Control
+              as="textarea"
+              name="message"
+              value={complaintData.message}
+              onChange={handleComplaintFormChange}
+            />
+          </Form.Group>
+          <Button variant="primary" type="submit">
+            Submit
+          </Button>
+        </Form>
+      </Modal.Body>
+    </Modal>
+
+
+    <Modal show={showAccountsModal} dialogClassName="custom-modal" onHide={() => setShowAccountsModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Accounts</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Maintenance</th>
+                <th>Month</th>
+                <th>Paid On</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Water Bill</th>
+                <th>User ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {accounts.map((account) => (
+                <tr key={account.id}>
+                  <td>{account.id}</td>
+                  <td>{account.maintenanceBill}</td>
+                  <td>{account.month}</td>
+                  <td>{account.paidOn}</td>
+                  <td>{account.status}</td>
+                  <td>{account.total}</td>
+                  <td>{account.waterBill}</td>
+                  <td>{account.userId}</td>
+                  <td>
+                    {account.status !== 'Paid' && (
+                      <Button variant='success' onClick={() => handlePay(account.id)}>
+                        Pay
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant='secondary' onClick={() => setShowAccountsModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+        </Modal>
+
+
+        
+
+    
+
+
+
+          <hr />
+        </>
+      ) : (
+        <div>
+          <h1>You are Logged out!</h1>
+          <button onClick={handleClick3} className='btn btn-primary btn-block'>
+            <h3>Login as Member</h3>
+          </button>
+          <br />
+          <button className='link-btn' onClick={handleClick4}>
+            <h5>Go back to main page</h5>
+          </button>
+        </div>
+      )}
     </div>
-  );
+  
+);
 };

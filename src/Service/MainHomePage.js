@@ -28,13 +28,13 @@ export const MainHomePage = () => {
     <div className={`wrapper ${isMemberLogin ? 'animate-signUp' : 'animate-signIn'}`}>
       <div className={`form-wrapper sign-up ${isMemberLogin ? 'animate-signUp' : ''}`}>
         <form action="">
-          <h2>Member Login</h2>
+          <h2  style={{ color: 'white' }}>Member Login</h2>
 
           <button onClick={handleClick1} type="submit" className="btn">
             Login
           </button>
           <div className="sign-link">
-            <p>
+            <p className="not-member">
               Not a member? <a href="#" onClick={handleToggleForm} className="memberLogin-link">Admin Login</a>
             </p>
           </div>
@@ -43,13 +43,13 @@ export const MainHomePage = () => {
 
       <div className={`form-wrapper sign-in ${isMemberLogin ? '' : 'animate-signIn'}`}>
         <form action="">
-          <h2>Admin Login</h2>
+          <h2  style={{ color: 'white' }}>Admin Login</h2>
 
           <button onClick={handleClick2} type="submit" className="btn">
             Login
           </button>
           <div className="sign-link">
-            <p>
+            <p className="not-member">
               Not an Admin? <a href="#" onClick={handleToggleForm} className="adminLogin-link">Member Login</a>
             </p>
           </div>

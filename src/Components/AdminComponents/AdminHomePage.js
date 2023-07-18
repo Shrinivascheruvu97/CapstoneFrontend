@@ -158,7 +158,7 @@ export const AdminHomePage = () => {
                 Members
               </a>
               <a onClick={handleClick6}>Elections</a>
-              <a href="#">Portfolio</a>
+              
               <a onClick={logout}>
                 <LogoutIcon />
               </a>

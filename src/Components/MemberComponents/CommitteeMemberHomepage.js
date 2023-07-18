@@ -36,6 +36,7 @@ export const CommitteeMemberHomePage = () => {
   });
   const [accounts, setAccounts] = useState([]);
   const [showAccountsModal, setShowAccountsModal] = useState(false);
+  const [showAccountsModal1, setShowAccountsModal1] = useState(false);
   const [notices, setNotices] = useState([]);
 
 
@@ -296,6 +297,17 @@ const renderAddRemainderForm = () => {
   };
   
 
+  const fetchAccounts1 = async () => {
+    try {
+      const response = await axios.get('http://localhost:9001/committee/allaccounts');
+      setAccounts(response.data);
+      setShowAccountsModal1(true);
+    } catch (error) {
+      console.error(error);
+      // Handle error scenario
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get('http://localhost:9001/admin/members');
@@ -323,6 +335,7 @@ const renderAddRemainderForm = () => {
     }
   };
 
+  
   const handlePay = async (accountId) => {
     try {
          const userId = parseInt(localStorage.getItem('userId'));
@@ -863,6 +876,9 @@ return (
 
   return (
     <div>
+      {isLoggedIn1 ? (
+        <>
+    <div>
         <nav>
         <nav className='navbar navbar-expand-lg navbar-dark bg-dark'>
           <div className='container-fluid'>
@@ -897,8 +913,10 @@ return (
                   <Dropdown.Menu>
                     
                     <Dropdown.Item onClick={() => setShowAccountsModal(true)} >Accounts</Dropdown.Item>
+                    <Dropdown.Item onClick={fetchAccounts1} >Members Accounts</Dropdown.Item>
                     
                   </Dropdown.Menu>
+                  
                 </Dropdown>
                 <Dropdown>
                   <Dropdown.Toggle variant='dark' id='dropdown-election'>
@@ -923,9 +941,8 @@ return (
           </div>
         </nav>
       </nav>
-      <div>
-      {isLoggedIn1 ? (
-        <>
+      </div>
+      
           <h1>Welcome</h1>
           <h4>{memberDetails.firstName} {memberDetails.lastName}</h4>
           <hr />
@@ -1258,6 +1275,51 @@ return (
   </Modal.Body>
 </Modal>
 
+
+<Modal show={showAccountsModal1} dialogClassName="custom-modal" onHide={() => setShowAccountsModal1(false)}>
+  <Modal.Header closeButton>
+    <Modal.Title>Accounts</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Table striped bordered hover>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Maintenance</th>
+          <th>Month</th>
+          <th>Paid On</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Water Bill</th>
+          <th>User ID</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        {accounts.map((account) => (
+          <tr key={account.id}>
+            <td>{account.id}</td>
+            <td>{account.maintenanceBill}</td>
+            <td>{account.month}</td>
+            <td>{account.paidOn}</td>
+            <td>{account.status}</td>
+            <td>{account.total}</td>
+            <td>{account.waterBill}</td>
+            <td>{account.userId}</td>
+            
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant='secondary' onClick={() => setShowAccountsModal1(false)}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
+
+
         </>
       ) : (
         <div>
@@ -1269,6 +1331,6 @@ return (
       )}
       
       </div>
-    </div>
+    
   );
 };

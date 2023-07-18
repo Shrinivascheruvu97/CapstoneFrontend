@@ -13,8 +13,14 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(#2196f3, #e91e63);
+    /* background: linear-gradient(#2196f3, #e91e63); */
+    background: linear-gradient(to right, #5d6d61, #08992d);
+    background-image: url('https://www.amarahomes.in/lp/assets/img/Amara-Vana.jpg');
     overflow: auto;
+    background-size: cover;
+    background-repeat: no-repeat;
+    
+
 }
 
 .wrapper {
@@ -32,9 +38,15 @@ body {
     align-items: center;
     width: 100%;
     height: 100%;
-    background: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    /* background: #fff; */
+    background: linear-gradient(to right, #ffffff, #6b4703);
+    background-image: url('https://cutewallpaper.org/21/background-gif-animation/Pin-on-Gifs-%E2%98%86.gif');
+    box-shadow: 0 0 10px rgba(255, 254, 254, 0.2);
+    
 }
+.not-member {
+    color: white;
+  }
 
 .wrapper.animate-signUp .form-wrapper.sign-in {
     transform: rotate(7deg);
@@ -162,8 +174,11 @@ h2 {
     left: 0;
     width: 100%;
     height: 40px;
-    background: linear-gradient(to right, #2196f3, #e91e63);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .4);
+    /* background: linear-gradient(to right, #2196f3, #e91e63); */
+    background: linear-gradient(to right, #3b3024, #a56108);
+    /* background: linear-gradient(79deg, #7439db, #c66fbc 48%, #f7944d); */
+   
+    box-shadow: 0 2px 10px rgba(248, 246, 246, 0.4);
     font-size: 16px;
     color: #fff;
     font-weight: 500;
@@ -180,11 +195,11 @@ h2 {
 }
 
 .sign-link p {
-    color: #333;
+    color: #f7f3f3;
 }
 
 .sign-link p a {
-    color: #e91e63;
+    color: #996b08;
     text-decoration: none;
     font-weight: 600;
 }
@@ -214,7 +229,7 @@ nav {
     left: 0;
     width: 100%;
     height: 50px;
-    background-color: #0e0d0e;
+    background-color: #f3eff3;
     border-radius: 8px;
     font-size: 0;
     box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
@@ -394,7 +409,7 @@ nav .start-contact,a:nth-child(5):hover~.animation{
   
   .notice-date {
     font-size: 12px;
-    color: gray;
+    color: rgb(12, 12, 12);
     margin-bottom: 10px;
   }
   
@@ -423,6 +438,9 @@ nav .start-contact,a:nth-child(5):hover~.animation{
     height: 100%;
     object-fit: cover;
   }
+  
+
+ 
   
   
 

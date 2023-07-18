@@ -152,14 +152,15 @@ export const MemberLogin = () => {
     }
 
     return(
-        <div className>
+        <div class="wrapper">
             <div className='auth-form-container'>
                 <h2>Member Login</h2><hr/>
                 <form className='login-form' onSubmit={handleLogin}>
-                    <label htmlFor='email'>email</label>
+                    <label htmlFor='email'><b>Email</b></label>
                     <input onChange={handleInput} type='email' placeholder='Email' id='email' name='email' required/>
-                    <label htmlFor='password'>password</label>
+                    <label htmlFor='password'><b>Password</b></label>
                     <input onChange={handleInput} type='password' placeholder='********' id='password' name='password' required/>
+                    <hr></hr>
                     <button type='submit' className='btn btn-primary'>Log In</button>
                 </form>
                 <button className='link-btn' onClick={handleClick}>Go back to main Page</button>

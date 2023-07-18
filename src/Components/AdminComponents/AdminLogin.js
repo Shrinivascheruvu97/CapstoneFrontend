@@ -59,7 +59,7 @@ export const AdminLogin = () => {
 
         
         <div class="wrapper">
-        <div class="form-wrapper sign-in">
+        <div className='auth-form-container'>
             <form className='Login-form' onSubmit={handleLogin} action="">
                 <h2>Login</h2>
                 <div class="input-group">
